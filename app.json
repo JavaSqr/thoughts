@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "Thought Keeper",
+    "slug": "thought-keeper",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#EFE7D8"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.thoughtkeeper.app",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Доступ к фото нужен для прикрепления к заметкам",
+        "NSCameraUsageDescription": "Доступ к камере для съёмки прямо в заметку"
+      }
+    },
+    "android": {
+      "package": "com.thoughtkeeper.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#EFE7D8"
+      },
+      "permissions": [
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Доступ к фото нужен для прикрепления к заметкам",
+          "cameraPermission": "Доступ к камере для съёмки прямо в заметку"
+        }
+      ],
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "e528352d-0f80-45e3-b669-1f7efb1b9fa8"
+      }
+    }
+  }
+}
