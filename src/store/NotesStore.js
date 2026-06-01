@@ -21,13 +21,15 @@ export function NotesProvider({ children }) {
   const [categories, setCategories] = useState([]);
   const [loaded, setLoaded] = useState(false);
 
-  // null = "Все мысли"; filterNoCategoryOnly = true => без категории
+  // null + filterNoCategoryOnly=false: show all notes.
+  // null + filterNoCategoryOnly=true:  show notes with no category.
+  // any id: show notes from that category.
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [filterNoCategoryOnly, setFilterNoCategoryOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
 
-  // Чтобы не сохранять при самой первой загрузке
+  // Skip the very first save (right after we load from disk).
   const skipPersist = useRef(true);
 
   useEffect(() => {
@@ -43,7 +45,7 @@ export function NotesProvider({ children }) {
     })();
   }, []);
 
-  // Персист при изменениях (после первичной загрузки)
+  // Persist changes after the initial load.
   useEffect(() => {
     if (!loaded) return;
     if (skipPersist.current) {
@@ -58,7 +60,7 @@ export function NotesProvider({ children }) {
     StorageService.saveCategories(categories);
   }, [categories, loaded]);
 
-  // === Фильтры ===
+  // --- Filters ---
   const selectAllCategories = useCallback(() => {
     setSelectedCategoryId(null);
     setFilterNoCategoryOnly(false);
@@ -82,7 +84,7 @@ export function NotesProvider({ children }) {
     setCurrentPage(0);
   }, []);
 
-  // === Производные: фильтрованный список ===
+  // --- Derived: filtered list ---
   const filteredNotes = useMemo(() => {
     let result = notes;
     if (filterNoCategoryOnly) {
@@ -109,7 +111,7 @@ export function NotesProvider({ children }) {
     return Math.floor((n - 1) / NOTES_PER_PAGE) + 1;
   }, [filteredNotes]);
 
-  // Удерживаем currentPage в допустимых границах
+  // Clamp the page if the list shrank below it.
   const safePage = Math.min(currentPage, totalPages - 1);
 
   const pageNotes = useMemo(() => {
@@ -119,7 +121,7 @@ export function NotesProvider({ children }) {
     return filteredNotes.slice(start, end);
   }, [filteredNotes, safePage]);
 
-  // === CRUD заметок ===
+  // --- Notes CRUD ---
   const addNote = useCallback(
     (text, { categoryId = null, attachments = [] } = {}) => {
       const trimmed = (text || '').trim();
@@ -175,8 +177,8 @@ export function NotesProvider({ children }) {
     });
   }, []);
 
-  // Переупорядочивание в пределах текущей видимой группы.
-  // fromIndex/toIndex — индексы внутри pageNotes (ReorderableList-семантика).
+  // Reorder within the currently visible group.
+  // fromIndex/toIndex follow ReorderableList semantics (insertion index).
   const reorderNotes = useCallback(
     (fromIndex, toIndex) => {
       const visible = [...pageNotes];
@@ -190,7 +192,7 @@ export function NotesProvider({ children }) {
       const insertAt = to > fromIndex ? to - 1 : to;
       visible.splice(insertAt, 0, moved);
 
-      // Текущая группа целиком (отсортирована по order)
+      // Full group, sorted by order.
       const groupList = notes
         .filter((n) => {
           if (filterNoCategoryOnly) return n.categoryId == null;
@@ -204,8 +206,8 @@ export function NotesProvider({ children }) {
       const visibleIds = new Set(visible.map((e) => e.id));
       const outOfPage = groupList.filter((n) => !visibleIds.has(n.id));
 
-      // Назначаем новые order: позиции страницы берём из visible,
-      // остальные сохраняют относительный порядок
+      // Renumber: on-page positions come from `visible`,
+      // the rest keep their relative order.
       const orderById = {};
       let outIdx = 0;
       let counter = 1;
@@ -228,7 +230,7 @@ export function NotesProvider({ children }) {
     [pageNotes, notes, filterNoCategoryOnly, selectedCategoryId, safePage]
   );
 
-  // === CRUD категорий ===
+  // --- Categories CRUD ---
   const addCategory = useCallback((name, emoji = '📁') => {
     const trimmed = (name || '').trim();
     if (trimmed.length === 0) return;
@@ -250,7 +252,7 @@ export function NotesProvider({ children }) {
 
   const deleteCategory = useCallback(
     (id) => {
-      // Заметки этой категории становятся "без категории"
+      // Notes in this category become uncategorized.
       setNotes((prev) =>
         prev.map((n) => (n.categoryId === id ? { ...n, categoryId: null } : n))
       );
@@ -284,19 +286,19 @@ export function NotesProvider({ children }) {
     filteredNotes,
     pageNotes,
     notesPerPage: NOTES_PER_PAGE,
-    // фильтры
+    // filters
     selectAllCategories,
     selectNoCategory,
     selectCategory,
     setSearch,
     setPage: setCurrentPage,
-    // заметки
+    // notes
     addNote,
     updateNote,
     deleteNote,
     moveNoteToCategory,
     reorderNotes,
-    // категории
+    // categories
     addCategory,
     renameCategory,
     deleteCategory,

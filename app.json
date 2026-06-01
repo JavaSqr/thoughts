@@ -1,54 +1,51 @@
 {
   "expo": {
-    "name": "Thought Keeper",
-    "slug": "thought-keeper",
+    "name": "Thoughts",
+    "slug": "thoughts",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#EFE7D8"
+      "resizeMode": "cover",
+      "backgroundColor": "#EFE7D8",
+      "dark": {
+        "image": "./assets/splash-dark.png",
+        "resizeMode": "cover",
+        "backgroundColor": "#2D2837"
+      }
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.thoughtkeeper.app",
+      "bundleIdentifier": "com.thoughts.app",
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "Доступ к фото нужен для прикрепления к заметкам",
-        "NSCameraUsageDescription": "Доступ к камере для съёмки прямо в заметку"
+        "NSPhotoLibraryUsageDescription": "Photo access is required to attach images to your thoughts",
+        "NSCameraUsageDescription": "Camera access is required to capture images directly into a thought"
       }
     },
     "android": {
-      "package": "com.thoughtkeeper.app",
+      "package": "com.thoughts.app",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#EFE7D8"
+        "backgroundColor": "#55456B"
       },
       "permissions": [
-        "android.permission.READ_MEDIA_IMAGES",
-        "android.permission.READ_MEDIA_VIDEO",
-        "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.RECORD_AUDIO"
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_VIDEO",
+        "READ_EXTERNAL_STORAGE"
       ]
     },
     "plugins": [
       [
         "expo-image-picker",
         {
-          "photosPermission": "Доступ к фото нужен для прикрепления к заметкам",
-          "cameraPermission": "Доступ к камере для съёмки прямо в заметку"
+          "photosPermission": "Photo access is required to attach images to your thoughts",
+          "cameraPermission": "Camera access is required to capture images directly into a thought"
         }
-      ],
-      "expo-font"
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "e528352d-0f80-45e3-b669-1f7efb1b9fa8"
-      }
-    }
+      ]
+    ]
   }
 }

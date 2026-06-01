@@ -33,7 +33,7 @@ export function SettingsProvider({ children }) {
       if (savedLocale && supportedLocales.includes(savedLocale)) {
         setLocale(savedLocale);
       } else {
-        // Автоопределение языка устройства
+        // Fall back to device language if it's one we support.
         const device = Localization.getLocales?.()[0]?.languageCode;
         setLocale(supportedLocales.includes(device) ? device : 'ru');
       }

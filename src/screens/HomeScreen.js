@@ -80,7 +80,7 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={[styles.root, { backgroundColor: theme.bg }]}>
-      {/* Верхняя панель / зона удаления */}
+      {/* Top bar / delete zone */}
       <View
         style={{ paddingTop: insets.top + 8 }}
         onLayout={(e) =>
@@ -161,7 +161,7 @@ export default function HomeScreen({ navigation }) {
         )}
       </View>
 
-      {/* Список заметок */}
+      {/* Notes list */}
       <KeyboardAvoidingView
         style={{ flex: 1, backgroundColor: theme.bg }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -204,7 +204,7 @@ export default function HomeScreen({ navigation }) {
           )}
         </ScrollView>
 
-        {/* Пагинация */}
+        {/* Pagination */}
         {store.totalPages > 1 && (
           <View style={styles.pagination}>
             <TouchableOpacity
@@ -244,7 +244,7 @@ export default function HomeScreen({ navigation }) {
           </View>
         )}
 
-        {/* Поле ввода */}
+        {/* Input */}
         <NoteInput onSubmit={handleSubmit} />
       </KeyboardAvoidingView>
 

@@ -16,27 +16,27 @@ import { useI18n } from '../i18n/i18n';
 import { useNotes } from '../store/NotesStore';
 
 const EMOJI_CHOICES = [
-  // Базовые
+  // Basic
   '📁', '📂', '🗂️', '📋', '📌', '📍', '🏷️', '🔖',
-  // Идеи и работа
+  // Ideas & work
   '💡', '📝', '✏️', '✍️', '📚', '📖', '🎓', '💼',
-  // Эмоции и личное
+  // Emotions & personal
   '⭐', '🌟', '✨', '❤️', '💛', '💚', '💙', '💜',
-  // Действия
+  // Action
   '🔥', '⚡', '🎯', '🚀', '🏆', '🎁', '🎉', '🎨',
-  // Жизнь
+  // Life
   '🏠', '✈️', '🚗', '🌍', '🌱', '🌸', '🍔', '☕',
-  // Хобби
+  // Hobbies
   '🎵', '🎮', '📷', '🎬', '⚽', '🏃', '🧘', '🛒',
-  // Прочее
+  // Misc
   '💭', '🤔', '😊', '😎', '🌙', '☀️', '🌈', '💎',
 ];
 
 function CategoryModal({ visible, initial, onClose, onSubmit, t, theme }) {
   const [name, setName] = useState(initial?.name || '');
-  // emoji - значение для предпросмотра (большой квадрат + подсветка в сетке).
-  // emojiInput - свободный текст в поле ввода (что юзер набирает с клавиатуры).
-  // Эти два состояния независимы: ввод в поле НЕ перезаписывает emoji, пока он не отправлен.
+  // `emoji` is the value that gets saved and shown in the big preview.
+  // `emojiInput` is whatever the user is typing in the field.
+  // They stay independent so typing doesn't keep overwriting the preview.
   const [emoji, setEmoji] = useState(initial?.emoji || '📁');
   const [emojiInput, setEmojiInput] = useState('');
 
@@ -48,7 +48,7 @@ function CategoryModal({ visible, initial, onClose, onSubmit, t, theme }) {
     }
   }, [visible, initial]);
 
-  // Применить то, что введено в поле, как текущий эмодзи
+  // Promote whatever's in the input field to the active emoji.
   const applyCustomEmoji = () => {
     const v = emojiInput.trim();
     if (v.length > 0) setEmoji(v);
@@ -70,7 +70,7 @@ function CategoryModal({ visible, initial, onClose, onSubmit, t, theme }) {
             {t('category_emoji')}
           </Text>
 
-          {/* Текущий выбор + свободное поле ввода своего эмодзи */}
+          {/* Current preview + free-form input for a custom emoji */}
           <View style={styles.currentEmojiRow}>
             <View
               style={[
@@ -164,7 +164,7 @@ function CategoryModal({ visible, initial, onClose, onSubmit, t, theme }) {
             <TouchableOpacity
               onPress={() => {
                 if (name.trim().length === 0) return;
-                // Если что-то осталось в поле ввода эмодзи - применить
+                // If there's text in the input, use it as the emoji.
                 const finalEmoji =
                   emojiInput.trim().length > 0 ? emojiInput.trim() : emoji;
                 onSubmit(name.trim(), finalEmoji);
@@ -299,7 +299,7 @@ export default function SidePanel({ navigation }) {
         )}
       </ScrollView>
 
-      {/* Кнопка настроек */}
+      {/* Settings button */}
       <TouchableOpacity
         style={[styles.settingsBtn, { borderTopColor: theme.divider }]}
         onPress={() => {
@@ -322,9 +322,7 @@ export default function SidePanel({ navigation }) {
         theme={theme}
       />
 
-      {/* Контекстное действие удаления категории через длинное нажатие:
-          показываем подтверждение прямо в модалке редактирования —
-          добавим кнопку удаления там же */}
+      {/* Floating delete button shown while editing an existing category */}
       {editingCategory && modalVisible && (
         <DeleteCategoryButton
           theme={theme}
@@ -339,7 +337,7 @@ export default function SidePanel({ navigation }) {
   );
 }
 
-// Небольшая плавающая кнопка удаления, появляется при редактировании
+// Small floating delete button that appears while editing a category.
 function DeleteCategoryButton({ theme, t, onDelete }) {
   return (
     <View pointerEvents="box-none" style={styles.deleteFloatWrap}>

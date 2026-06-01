@@ -10,6 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../theme/theme';
 import { useI18n } from '../i18n/i18n';
+import MediaViewer from './MediaViewer';
 
 const COLLAPSED_MAX_LINES = 3;
 
@@ -69,8 +70,10 @@ export default function NoteCard({
   const theme = useTheme();
   const { t } = useI18n();
   const [expanded, setExpanded] = useState(false);
+  // Index of the attachment to open in the fullscreen viewer; null = closed.
+  const [viewerIndex, setViewerIndex] = useState(null);
 
-  // При перетаскивании сворачиваем
+  // Collapse the card while it's being dragged.
   useEffect(() => {
     if ((isDragging || forceCollapsed) && expanded) {
       setExpanded(false);
@@ -92,8 +95,8 @@ export default function NoteCard({
           backgroundColor: theme.card,
           shadowColor: theme.shadow,
           marginVertical: isDragging ? 4 : 6,
-          // На Android elevation портит рендеринг текста (теряется sub-pixel AA).
-          // В обычном состоянии elevation: 0; включаем только при перетаскивании.
+          // elevation on Android softens text rendering, so keep it off
+          // in the resting state and only enable it while dragging.
           elevation: isDragging ? 10 : 0,
           opacity: isDragging ? 0.97 : 1,
           transform: isDragging ? [{ scale: 1.03 }] : [],
@@ -101,7 +104,7 @@ export default function NoteCard({
       ]}
     >
       <Pressable onPress={toggle} style={styles.inner}>
-        {/* Текст */}
+        {/* Text */}
         {hasText &&
           (expanded ? (
             <Text style={[styles.text, { color: theme.cardText }]}>
@@ -117,8 +120,8 @@ export default function NoteCard({
             </Text>
           ))}
 
-        {/* Вложения - всегда все смонтированы, чтобы Image не терял содержимое
-            при сворачивании. Лишние просто скрываются через display:none. */}
+        {/* Attachments. All thumbs stay mounted so <Image> keeps its
+            content when the card collapses; extras are just hidden. */}
         {hasAttachments && (
           <View style={[styles.attachRow, hasText && { marginTop: 10 }]}>
             {note.attachments.map((a, i) => {
@@ -131,6 +134,7 @@ export default function NoteCard({
                   <AttachmentThumb
                     attachment={a}
                     size={expanded ? 104 : 64}
+                    onPress={() => setViewerIndex(i)}
                   />
                 </View>
               );
@@ -150,7 +154,7 @@ export default function NoteCard({
           </View>
         )}
 
-        {/* Подвал развёрнутой карточки */}
+        {/* Footer for the expanded card */}
         {expanded && (
           <View style={styles.footer}>
             <Text style={[styles.date, { color: theme.cardTextSecondary }]}>
@@ -194,6 +198,13 @@ export default function NoteCard({
           </View>
         )}
       </Pressable>
+
+      <MediaViewer
+        visible={viewerIndex != null}
+        attachments={note.attachments}
+        startIndex={viewerIndex ?? 0}
+        onClose={() => setViewerIndex(null)}
+      />
     </View>
   );
 }
@@ -201,7 +212,7 @@ export default function NoteCard({
 const styles = StyleSheet.create({
   card: {
     borderRadius: 20,
-    // Лёгкая iOS-тень; на Android тень даёт только elevation (выше).
+    // Light iOS shadow. On Android the shadow comes from elevation (above).
     shadowOpacity: 0.12,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },

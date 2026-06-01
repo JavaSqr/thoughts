@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
@@ -9,8 +9,9 @@ import {
 } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { View, ActivityIndicator, StatusBar, Platform } from 'react-native';
+import { View, StatusBar, Animated, StyleSheet } from 'react-native';
 import * as SystemUI from 'expo-system-ui';
+import * as SplashScreen from 'expo-splash-screen';
 
 import { SettingsProvider, useSettings } from './src/store/SettingsStore';
 import { NotesProvider } from './src/store/NotesStore';
@@ -20,6 +21,10 @@ import { I18nProvider } from './src/i18n/i18n';
 import HomeScreen from './src/screens/HomeScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import SidePanel from './src/components/SidePanel';
+import UpdateChecker from './src/components/UpdateChecker';
+
+// Keep the splash visible until our content is ready.
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
@@ -44,32 +49,28 @@ function DrawerNav() {
 
 function Root() {
   const { theme, ready } = useSettings();
+  // Overlay opacity for the splash fade-out (1 = fully covering, 0 = invisible).
+  const splashOpacity = useRef(new Animated.Value(1)).current;
+  const [splashVisible, setSplashVisible] = useState(true);
 
-  // Синхронизируем фон нативного корневого view с темой.
-  // Это нужно, чтобы при открытии клавиатуры на Android
-  // не проглядывал белый фон активити во время анимации resize окна.
+  // Keep the native window background in sync with the theme so the
+  // Android system doesn't flash white when the keyboard opens.
   useEffect(() => {
-    if (ready) {
-      SystemUI.setBackgroundColorAsync(theme.bg).catch(() => {});
-    }
-  }, [theme.bg, ready]);
+    SystemUI.setBackgroundColorAsync(theme.bg).catch(() => {});
+  }, [theme.bg]);
 
-  if (!ready) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: theme.bg,
-        }}
-      >
-        <ActivityIndicator color={theme.primary} size="large" />
-      </View>
-    );
-  }
+  // When data is loaded: hide the native splash and fade out our overlay.
+  useEffect(() => {
+    if (!ready) return;
+    SplashScreen.hideAsync().catch(() => {});
+    Animated.timing(splashOpacity, {
+      toValue: 0,
+      duration: 500,
+      useNativeDriver: true,
+    }).start(() => setSplashVisible(false));
+  }, [ready, splashOpacity]);
 
-  // Тема навигации — чтобы при переходах между экранами фон совпадал с фоном приложения
+  // Match the navigation theme to our background so transitions don't flash.
   const baseNavTheme = theme.mode === 'dark' ? NavDarkTheme : NavDefaultTheme;
   const navTheme = {
     ...baseNavTheme,
@@ -90,32 +91,49 @@ function Root() {
         backgroundColor={theme.bg}
         translucent={false}
       />
-      <NavigationContainer theme={navTheme}>
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: theme.bg },
-            animation: 'slide_from_right',
-          }}
-        >
-          <Stack.Screen name="Drawer" component={DrawerNav} />
-          <Stack.Screen
-            name="Settings"
-            component={SettingsScreen}
-            options={{ presentation: 'card' }}
+      <View style={{ flex: 1, backgroundColor: theme.bg }}>
+        {ready && (
+          <NavigationContainer theme={navTheme}>
+            <Stack.Navigator
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: theme.bg },
+                animation: 'slide_from_right',
+              }}
+            >
+              <Stack.Screen name="Drawer" component={DrawerNav} />
+              <Stack.Screen
+                name="Settings"
+                component={SettingsScreen}
+                options={{ presentation: 'card' }}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        )}
+
+        {/* Solid-color overlay that fades out once content is ready.
+            Color matches the theme so the splash blends into the app. */}
+        {splashVisible && (
+          <Animated.View
+            pointerEvents={ready ? 'none' : 'auto'}
+            style={[
+              StyleSheet.absoluteFill,
+              { backgroundColor: theme.bg, opacity: splashOpacity },
+            ]}
           />
-        </Stack.Navigator>
-      </NavigationContainer>
+        )}
+      </View>
     </ThemeProvider>
   );
 }
 
-// Мост: язык берём из настроек и пробрасываем в I18nProvider
+// Bridge: pull locale from settings and feed it into I18nProvider.
 function LocalizedRoot() {
   const { locale } = useSettings();
   return (
     <I18nProvider locale={locale}>
       <NotesProvider>
+        <UpdateChecker />
         <Root />
       </NotesProvider>
     </I18nProvider>

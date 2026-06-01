@@ -80,7 +80,7 @@ export const StorageService = {
   async loadConfirmDelete() {
     try {
       const raw = await AsyncStorage.getItem(KEYS.confirmDelete);
-      // По умолчанию подтверждение включено
+      // Confirmation is on by default.
       if (raw == null) return true;
       return raw === 'true';
     } catch (e) {

@@ -14,10 +14,10 @@ import { useTheme } from '../theme/theme';
 import { useI18n } from '../i18n/i18n';
 import { useSettings } from '../store/SettingsStore';
 
-// ==== Замени на свои контакты ====
+// ==== Replace with your own contacts ====
 const TELEGRAM_HANDLE = '@your_telegram';
 const BUG_EMAIL = 'bugs@example.com';
-// =================================
+// =========================================
 
 export default function SettingsScreen({ navigation }) {
   const theme = useTheme();
@@ -123,7 +123,6 @@ export default function SettingsScreen({ navigation }) {
   const langs = [
     { code: 'ru', label: 'Русский', flag: '🇷🇺' },
     { code: 'en', label: 'English', flag: '🇬🇧' },
-    { code: 'uz', label: "O'zbekcha", flag: '🇺🇿' },
   ];
 
   const themes = [
@@ -205,7 +204,7 @@ export default function SettingsScreen({ navigation }) {
             isLast
             onPress={() =>
               Linking.openURL(
-                `mailto:${BUG_EMAIL}?subject=Bug report - Thought Keeper`
+                `mailto:${BUG_EMAIL}?subject=Bug report - Thoughts`
               )
             }
           />

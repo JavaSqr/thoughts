@@ -1,0 +1,41 @@
+name: Build and Release APK
+
+on:
+  push:
+    tags:
+      - 'v*'   # triggers on tags like v1.0.0, v1.0.1, etc.
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Trigger EAS build
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          eas build \
+            --platform android \
+            --profile preview \
+            --non-interactive \
+            --no-wait
+
+      - name: Notify build started
+        run: |
+          echo "✅ EAS build started for tag ${{ github.ref_name }}"
+          echo "Check progress at https://expo.dev/accounts/<your-account>/projects/thoughts/builds"
+          echo "Once finished, download the APK and attach it to the GitHub Release."

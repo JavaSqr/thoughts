@@ -12,9 +12,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import NoteCard from './NoteCard';
 
-// Высота строки приблизительная — используется только для расчёта
-// позиции вставки при перетаскивании. Карточки разной высоты,
-// поэтому замеряем фактические позиции через onLayout.
+// We measure each row's actual height via onLayout since cards
+// have variable heights; that's used to compute drop positions.
 
 function DraggableRow({
   note,
@@ -96,13 +95,13 @@ export default function DraggableNoteList({
   onDragStateChange,
   onDeleteHoverChange,
   onDeleteDrop,
-  deleteZoneY, // абсолютная Y-координата нижней границы зоны удаления
+  deleteZoneY, // absolute Y of the bottom edge of the delete zone
   onEdit,
   onMove,
   onDelete,
 }) {
   const [draggingId, setDraggingId] = useState(null);
-  const layouts = useRef({}); // id -> {y, height} (в координатах списка)
+  const layouts = useRef({}); // id -> {y, height} in list coords
   const positionsRef = useRef([]);
   const fromIndexRef = useRef(-1);
 
@@ -121,7 +120,7 @@ export default function DraggableNoteList({
 
   const handleDragActive = useCallback(
     (id, index, absoluteY, translationY) => {
-      // Подсветка зоны удаления, если палец выше её нижней границы
+      // Highlight the delete zone if the finger is above its bottom edge.
       if (onDeleteHoverChange && deleteZoneY != null) {
         onDeleteHoverChange(absoluteY < deleteZoneY);
       }
@@ -143,7 +142,7 @@ export default function DraggableNoteList({
         return;
       }
 
-      // Вычисляем новый индекс по смещению
+      // Estimate the new index from how far the row was dragged.
       const rowHeight =
         layouts.current[id]?.height || 80;
       const shift = Math.round(translationY / rowHeight);
@@ -152,8 +151,8 @@ export default function DraggableNoteList({
       if (target > notes.length - 1) target = notes.length - 1;
 
       if (target !== index) {
-        // onReorder ожидает ReorderableList-семантику:
-        // индекс вставки = target при движении вниз нужно +1
+        // onReorder uses ReorderableList semantics: when moving down,
+        // bump the insertion index by 1.
         const insertIndex = target > index ? target + 1 : target;
         onReorder(index, insertIndex);
       }

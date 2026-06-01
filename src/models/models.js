@@ -1,6 +1,6 @@
 import uuid from 'react-native-uuid';
 
-// Вложение: фото / видео / gif
+// Attachment: photo, video, or gif.
 export function makeAttachment({ uri, type }) {
   return {
     id: uuid.v4(),
@@ -9,7 +9,7 @@ export function makeAttachment({ uri, type }) {
   };
 }
 
-// Заметка — без заголовка, только тело + вложения
+// A note: no title, just body text and optional attachments.
 export function makeNote({ text = '', categoryId = null, attachments = [], order = 0 }) {
   const now = Date.now();
   return {
@@ -23,7 +23,7 @@ export function makeNote({ text = '', categoryId = null, attachments = [], order
   };
 }
 
-// Категория
+// Category.
 export function makeCategory({ name, emoji = '📁', order = 0 }) {
   return {
     id: uuid.v4(),

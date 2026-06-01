@@ -16,8 +16,8 @@ import { useTheme } from '../theme/theme';
 import { useI18n } from '../i18n/i18n';
 import { makeAttachment } from '../models/models';
 
-// Копируем выбранный файл в постоянную папку приложения,
-// т.к. uri из пикера может быть временным.
+// Copy a picked file into the app's documents dir.
+// The original URI from the picker can be temporary.
 async function persistFile(uri) {
   try {
     const dir = FileSystem.documentDirectory + 'attachments/';
@@ -33,7 +33,7 @@ async function persistFile(uri) {
     return dest;
   } catch (e) {
     console.warn('persistFile failed', e);
-    return uri; // fallback на исходный uri
+    return uri; // fall back to the original URI
   }
 }
 
@@ -98,7 +98,7 @@ export default function NoteInput({ onSubmit }) {
         },
       ]}
     >
-      {/* Превью вложений */}
+      {/* Attachment previews */}
       {attachments.length > 0 && (
         <ScrollView
           horizontal

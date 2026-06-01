@@ -1,14 +1,13 @@
 import React, { createContext, useContext } from 'react';
 
-// Палитра из референсов пользователя:
-//  - Светлая: бежево-кремовый фон #EFE7D8, золотой акцент #C9A26B,
-//    тёмные карточки #1E1E1E (как в смарт-хом приложении)
-//  - Тёмная: фиолетовая палитра #2D2837 -> #756988
+// Color palette derived from user references:
+//  - Light: cream background with gold accent and dark cards.
+//  - Dark:  plum/purple palette.
 export const Palette = {
-  // золото / акцент
+  // accent
   gold: '#C9A26B',
   goldSoft: '#D8B888',
-  // светлая тема
+  // light theme
   lightBg: '#EFE7D8',
   lightCard: '#1E1E1E',
   lightCardText: '#F3ECDD',
@@ -16,7 +15,7 @@ export const Palette = {
   lightTextPrimary: '#2B2620',
   lightTextSecondary: '#8A7E6B',
   lightDivider: '#D7CAB2',
-  // тёмная тема
+  // dark theme
   darkBg: '#2D2837',
   darkCard: '#3A3349',
   darkSurface: '#453D57',
@@ -24,7 +23,7 @@ export const Palette = {
   darkTextPrimary: '#ECE7F2',
   darkTextSecondary: '#9D93AE',
   darkDivider: '#4A4259',
-  // общее
+  // shared
   deleteRed: '#E74C3C',
   deleteRedTransparent: 'rgba(231, 76, 60, 0.18)',
   white: '#FFFFFF',
