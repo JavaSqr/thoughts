@@ -15,8 +15,8 @@ import { useI18n } from '../i18n/i18n';
 import { useSettings } from '../store/SettingsStore';
 
 // ==== Replace with your own contacts ====
-const TELEGRAM_HANDLE = '@your_telegram';
-const BUG_EMAIL = 'bugs@example.com';
+const TELEGRAM_HANDLE = '@javaSqr';
+const BUG_EMAIL = 'javasqrt@gmail.com';
 // =========================================
 
 export default function SettingsScreen({ navigation }) {
